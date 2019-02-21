@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>星座スライドパズル</title>
+<style type="text/css">
+* {
+    box-sizing: border-box;
+}
+html {
+    /*font-size: 10px;*/
+}
+/*PC*/
+@media (min-width: 40.0rem) {
+    html {
+    /*font-size: 12px;*/
+    }
+}
+h1 {
+    font-size: 3rem;
+}
+.mb-small {
+    margin-bottom: 2.0rem;
+}
+.mb-large {
+    margin-bottom: 3.2rem;
+}
+.fs-large {
+    font-size: 2.0rem;
+}
+#field {
+    width: 50%;
+    margin: 0 auto 2.2rem;
+    border: 6px solid #C0C0C0;
+    /*background-color: #d3cbe3;*/
+    box-shadow: 2px 2px 4px gray;
+}
+.container {
+    text-align: center;
+    background-color: rgba(255,255,255,0.8);
+}
+code {
+    text-align: left;
+}
+
+.popup {
+    /*transition: all ease 0.5s;*/
+    width: 40vw;
+    height: 20vh;
+    z-index: 999;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    /*border: solid 4px gray;*/
+    border-radius: 2px;
+    box-shadow: 2px 3px 8px 0px gray;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.text_centerize {
+    width: inherit;
+    height: inherit;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    word-break: break-all;
+}
+.top-right-button {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    /*border: solid 1px black;*/
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+}
+
+#shuffle-button{
+    background: url(image/shuffleButton.png) left center no-repeat;
+    width: 7.5rem;
+    height: 2.5rem;
+    font-size: 20px;
+    box-shadow: 2px 2px 4px gray;
+}
+
+#post-button{
+    background: url(image/postButton.png) right top no-repeat;
+    width: 11rem;
+    height: 2.5rem;
+    font-size: 20px;
+    text-align: left;
+    box-shadow: 2px 2px 4px gray;
+}
+
+table{
+    margin:auto;
+}
+
+body{
+    margin:10px;
+    background: url(image/x02.gif);
+}
+</style>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="jqsrc/jquery.slidePuzzlize.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <section id="puzzle-area" class="mb-large">
+        <div id="field" class="mb-small"></div>
+        <button id="shuffle-button" class="button column-25 fs-large">SHUFFLE</button>
+        <button id="post-button" class="button column-25 fs-large">解説ページへ</button>
+    </section>
+
+    <table border>
+        <tr>
+            <td><input type="radio" name="signs" value="aries" checked>おひつじ座</td>
+            <td><input type="radio" name="signs" value="taurus">おうし座</td>
+            <td><input type="radio" name="signs" value="gemini">ふたご座</td>
+            <td><input type="radio" name="signs" value="cancer">かに座</td>
+            <td><input type="radio" name="signs" value="leo">しし座</td>
+            <td><input type="radio" name="signs" value="virgo">おとめ座</td>
+        </tr>
+        <tr>
+            <td><input type="radio" name="signs" value="libra">てんびん座</td>
+            <td><input type="radio" name="signs" value="scorpius">さそり座</td>
+            <td><input type="radio" name="signs" value="sagittarius">いて座</td>
+            <td><input type="radio" name="signs" value="capricorn">やぎ座</td>
+            <td><input type="radio" name="signs" value="aquarius">みずがめ座</td>
+            <td><input type="radio" name="signs" value="pisces">うお座</td>
+        </tr>
+    </table>
+</div>
+
+<div id="clear-message-box" class="popup">
+    <p class="text_centerize">
+    クリア<br>
+    おめでとう！<br>
+    （クリックで閉じます）
+    </p>
+</div>
+
+<script type="text/javascript">
+var getImage = "aries";
+var imageURL = "image/" + getImage + ".png";
+
+// 初期化
+var puz = $.slidePuzzlize({
+    selector: "#field",
+    col: 2,
+    row: 2,
+});
+
+//-- 初期の画像セット --
+$(document).ready(function(){
+    $('#post-button, #clear-message-box').animate({
+        opacity: 0
+    });
+
+    //解説ページボタン
+    $('#post-button').click(function(){
+        window.open('reader.php?imageurl='+ getImage, '_blank');
+        //location.href = "reader.php?imageurl="+imageURL;
+       
+        //本来はPOSTメソッドを使いたかった……
+        /*$.post('reader.php',{'imageurl': imageURL},
+        function(data){
+            //リクエストが成功した際に実行する関数
+            alert("Data Loaded: " + data);
+        });*/
+    });
+
+    // 画像のセット
+    puz.setImage(imageURL, true).then(function(img) {
+        var ww = $(window).innerWidth();
+        var imgW = (ww*0.8 < img.width) ? ww*0.8: img.width;
+        this.resize(imgW, img.height*(imgW/img.width));
+        this.shuffle();
+        // クリア時
+        this.on('match', function() {
+            $('#clear-message-box').animate({
+                opacity: 1
+            }, {
+                start: function() {
+                    this.style.visibility = "visible";
+                }
+            });
+
+            $('#post-button').animate({
+                opacity: 1
+            }, {
+                start: function() {
+                    this.style.visibility = "visible";
+                }
+            });
+        });
+
+        // シャッフル
+        $('#shuffle-button').on('click', function() {
+            puz.shuffle();
+        })
+        // メッセージボックス消す
+        $("#clear-message-box").on('click', function() {
+            $("#clear-message-box").animate({
+            opacity: 0
+            }, {
+                complete: function() {
+                    this.style.visibility = "hidden";
+                }
+            });
+        })
+    })
+});
+
+//-- 画像切り替え --
+$(function(){
+    $('input[type="radio"]').change(function() {
+        getImage = $(this).val();
+        imageURL = "image/" + $(this).val() + ".png";
+
+        $('#post-button, #clear-message-box').animate({
+            opacity: 0
+        });
+
+        puz.setImage(imageURL, true).then(function(img) {
+            var ww = $(window).innerWidth();
+            var imgW = (ww*0.8 < img.width) ? ww*0.8: img.width;
+            this.resize(imgW, img.height*(imgW/img.width));
+            this.shuffle();
+            this.on('match', function() {
+                $('#clear-message-box').animate({
+                    opacity: 1
+                }, {
+                    start: function() {
+                        this.style.visibility = "visible";
+                    }
+                });
+            });
+            $('#shuffle-button').on('click', function() {
+                puz.shuffle();
+            })
+            $("#clear-message-box").on('click', function() {
+                $("#clear-message-box").animate({
+                    opacity: 0
+                }, {
+                    complete: function() {
+                        this.style.visibility = "hidden";
+                    }
+                });
+            })
+        })
+    });
+});
+
+</script>
+
+</body>
+</html>

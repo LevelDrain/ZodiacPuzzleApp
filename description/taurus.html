@@ -1,0 +1,39 @@
+<span id="WIKI_Title"></span>
+<span id="WIKI_Contents"></span>
+
+<script>
+	//const URL = "https://ja.wikipedia.org/w/api.php"
+    const URL = "http://wikipedia.simpleapi.net/api"
+
+	$(function(){
+		$.get( URL,
+			{	/*
+                action: "query",
+				prop: "revisions",
+				titles: "MSX",
+				rvprop: "content",
+				format: "json",
+				origin: "*",
+				dataType: "json"
+                */
+
+                "keyword":"おうし座",
+                "output":"json"
+			},
+            function(data){
+                for(i in data){
+                    $("#WIKI_Title").append("<h3>"+data[i].title+"</h3>");
+                    $("#WIKI_Contents").append("<p>"+data[i].body+"</p>");
+			    }
+		    },"jsonp"
+            /*
+			function(json){
+				let pageid = Object.keys(json.query.pages);
+				$("#WIKI_Title").html(json.query.pages[pageid].title);
+				$("#WIKI_Contents").html(json.query.pages[Object.keys(json.query.pages)].revisions[0]["*"]);
+			}
+            */
+	
+    	)
+	});
+</script>
